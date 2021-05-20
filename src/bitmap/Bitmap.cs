@@ -1,5 +1,5 @@
 using System.IO;
-using System.Linq;
+using System;
 
 public class Bitmap {
 
@@ -87,17 +87,10 @@ public class Bitmap {
     }
 
     public void SubBitmap(Bitmap dest, int x, int y, int subWidth, int subHeight) {
-        for(int xx = 0; xx < subWidth; xx++) {
-            for(int yy = 0; yy < subHeight; yy++) {
-                int xPix = x + xx;
-                int yPix = y + yy;
-                int offs = (xPix + yPix * Width) * 4;
-                byte r = Pixels[offs + 0];
-                byte g = Pixels[offs + 1];
-                byte b = Pixels[offs + 2];
-                byte a = Pixels[offs + 3];
-                dest.SetPixel(xx, yy, r, g, b, a);
-            }
+        for(int yy = 0; yy < subHeight; yy++) {
+            int srcOffs = (x + (y + yy) * Width) * 4;
+            int destOffs = yy * subWidth * 4;
+            Array.Copy(Pixels, srcOffs, dest.Pixels, destOffs, subWidth * 4);
         }
     }
 
@@ -105,6 +98,17 @@ public class Bitmap {
         for(int xx = 0; xx < width; xx++) {
             for(int yy = 0; yy < height; yy++) {
                 SetPixel(x + xx, y + yy, r, g, b, a);
+            }
+        }
+    }
+
+    public void Unpack1BPP(byte[] data, byte[][] pal) {
+        for(int i = 0; i < data.Length; i++) {
+            int xTile = (i / 8 * 8) % Width;
+            int yTile = i / Width * 8;
+            for(int j = 0; j < 8; j++) {
+                byte[] col = pal[(data[i] >> (7 - j) & 1)];
+                SetPixel(xTile + j, yTile + (i & 7), col[0], col[1], col[2], col[3]);
             }
         }
     }

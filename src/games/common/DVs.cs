@@ -3,7 +3,7 @@ public class DVs {
     private ushort Value;
 
     public byte HP {
-        get { return (byte) (((Attack & 1) << 3) | ((Defense & 1) << 2) | ((Speed & 1) << 1) | ((Special & 1))); }
+        get { return (byte) (((Value >> 9) & 8) | ((Value >> 6) & 4) | ((Value >> 3) & 2) | (Value & 1)); }
     }
 
     public byte Attack {
@@ -24,6 +24,16 @@ public class DVs {
     public byte Special {
         get { return (byte) ((Value) & 0xf); }
         set { Value = (byte) ((Value & 0xfff0) | value); }
+    }
+
+    public byte Upper {
+        get { return (byte) (Value >> 8); }
+        set { Value = (byte) ((Value & 0x00ff) | value); }
+    }
+
+    public byte Lower {
+        get { return (byte) (Value & 0xff); }
+        set { Value = (byte) ((Value & 0xff00) | value); }
     }
 
     public override string ToString() {

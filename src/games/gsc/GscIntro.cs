@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+
 // No stall strats for now
 public enum GscStrat {
 
     GfSkip,
+    TitleSkip,
     MmBack, Continue,
     FsBack
 }
@@ -11,8 +14,10 @@ public static class GscStratFunctions {
     public static void Execute(this GscStrat strat, Gsc gb) {
         switch(strat) {
             case GscStrat.GfSkip:
-                gb.Hold(Joypad.Left, 0x100);
-                gb.Press(Joypad.Start, Joypad.Start);
+                gb.Press(Joypad.Start);
+                break;
+            case GscStrat.TitleSkip:
+                gb.Press(Joypad.Start);
                 break;
             case GscStrat.MmBack:
                 gb.Press(Joypad.B, Joypad.Start);
@@ -27,13 +32,14 @@ public static class GscStratFunctions {
     }
 }
 
-public class GscIntroSequence {
+public class GscIntroSequence : List<GscStrat> {
 
     public int Delay;
-    public GscStrat[] Strats;
 
     public GscIntroSequence(params GscStrat[] strats) : this(0, strats) { }
-    public GscIntroSequence(int delay, params GscStrat[] strats) => (Delay, Strats) = (delay, strats);
+    public GscIntroSequence(int delay, params GscStrat[] strats) : base(strats) {
+        Delay = delay;
+    }
 
     public void Execute(Gsc gb) {
         ExecuteUntilIGT(gb);
@@ -41,7 +47,10 @@ public class GscIntroSequence {
     }
 
     public void ExecuteUntilIGT(Gsc gb) {
-        foreach(GscStrat strat in Strats) {
+        gb.HardReset(false);
+        gb.Hold(Joypad.Left, 0x100);
+
+        foreach(GscStrat strat in this) {
             strat.Execute(gb);
         }
 

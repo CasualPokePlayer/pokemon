@@ -75,10 +75,11 @@ public partial class GameBoy : IDisposable {
 
     // Get Reg and flag values.
     public Registers Registers {
-        get {
-            Libgambatte.gambatte_getregs(Handle, out Registers regs);
-            return regs;
-        }
+        get { Libgambatte.gambatte_getregs(Handle, out Registers regs); return regs; }
+    }
+
+    public int DividerState {
+        get { return Libgambatte.gambatte_getdivstate(Handle); }
     }
 
     public GameBoy(string biosFile, string romFile, SpeedupFlags speedupFlags = SpeedupFlags.None) {
@@ -122,6 +123,11 @@ public partial class GameBoy : IDisposable {
     public void Dispose() {
         if(Scene != null) Scene.Dispose();
         Libgambatte.gambatte_destroy(Handle);
+    }
+
+    public void HardReset(bool fade = false) {
+        Libgambatte.gambatte_reset(Handle, fade ? 101 * (2 << 14) : 0);
+        BufferSamples = 0;
     }
 
     // Emulates 'runsamples' number of samples, or until a video frame has to be drawn. (1 sample = 2 cpu cycles)
@@ -184,7 +190,6 @@ public partial class GameBoy : IDisposable {
     public byte CpuRead(int addr) {
         return Libgambatte.gambatte_cpuread(Handle, (ushort) addr);
     }
-
 
     // Returns the emulator state as a buffer.
     public byte[] SaveState() {
@@ -260,6 +265,9 @@ public partial class GameBoy : IDisposable {
         Joypad[] joypadFlags = { Joypad.Up, Joypad.Down, Joypad.Left, Joypad.Right, Joypad.Start, Joypad.Select, Joypad.B, Joypad.A };
         lines = lines.Subarray(2, lines.Length - 3);
         for(int i = 0; i < lines.Length; i++) {
+            if(lines[i][9] != '.') {
+                HardReset(false);
+            }
             Joypad joypad = Joypad.None;
             for(int j = 0; j < joypadFlags.Length; j++) {
                 if(lines[i][j + 1] != '.') {
