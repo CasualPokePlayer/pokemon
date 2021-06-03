@@ -32,6 +32,11 @@ public partial class Gsc {
         int ret = 0;
         foreach(Action action in actions) {
             switch(action & ~Action.A) {
+                case Action.Delay:
+                    InjectOverworld(Joypad.None);
+                    AdvanceFrame(Joypad.None);
+                    ret = Hold(Joypad.None, "OWPlayerInput");
+                    break;
                 case Action.Right:
                 case Action.Left:
                 case Action.Up:
@@ -39,9 +44,9 @@ public partial class Gsc {
                     Joypad input = (Joypad) action;
                     RunUntil("OWPlayerInput");
                     InjectOverworld(input);
-                    ret = Hold(input, "CountStep", "ChooseWildEncounter.startwildbattle", "PrintLetterDelay.checkjoypad", "DoPlayerMovement.BumpSound");
+                    ret = Hold(input, "CountStep", "RandomEncounter.ok", "PrintLetterDelay.checkjoypad", "DoPlayerMovement.BumpSound");
                     if(ret == SYM["CountStep"]) {
-                        ret = Hold(input, "OWPlayerInput", "ChooseWildEncounter.startwildbattle");
+                        ret = Hold(input, "OWPlayerInput", "RandomEncounter.ok");
                     }
 
                     if(ret != SYM["OWPlayerInput"]) {

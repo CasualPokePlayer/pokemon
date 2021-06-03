@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Numerics;
 
 class Program {
-    static void Main(string[] args) {
-        BluePikachuTAS.StartSearch(4);
+    static unsafe void Main(string[] args) {
+        GoldRattataTAS.StartSearch();
     }
 }

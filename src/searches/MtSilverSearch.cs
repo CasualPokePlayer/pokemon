@@ -19,7 +19,7 @@ public class EndState {
     }
 }
 
-public static class Route29Search {
+public static class MtSilverSearch {
 
     public static bool Buffered = false;
     public static bool Overflow = true;
@@ -32,9 +32,12 @@ public static class Route29Search {
     public static StreamWriter cherrygroveWriter = new StreamWriter("r29_cherrygrove_" + GlobalDelay + ".txt");
     public static StreamWriter endWriter = new StreamWriter("r29_end_" + GlobalDelay + ".txt");
 
-    public static GscMap r29;
-    public static GscMap cherrygrove;
-    public static GscMap r30;
+    public static GscMap r28;
+    public static GscMap mtsilver;
+    public static GscMap silverCaveOutside;
+    public static GscMap silverCaveRoom1;
+    public static GscMap silverCaveRoom2;
+    public static GscMap silverCaveRoom3;
 
     public static void Start(string[] args) {
         string[] startPaths = {
@@ -52,40 +55,33 @@ public static class Route29Search {
 
     public static void BuildGraph() {
         Gold gb = new Gold();
-        r29 = gb.Maps["Route29"];
-        cherrygrove = gb.Maps["CherrygroveCity"];
-        r30 = gb.Maps["Route30"];
+        r28 = gb.Maps["Route28"];
+		silverCaveOutside = gb.Maps["SilverCaveOutside"];
+        silverCaveRoom1 = gb.Maps["SilverCaveRoom1"];
+		silverCaveRoom2 = gb.Maps["SilverCaveRoom2"];
+		silverCaveRoom3 = gb.Maps["SilverCaveRoom3"];
 
-        cherrygrove.Sprites.Remove(39, 6);
-
-        Pathfinding.GenerateEdges(r29, 0, 17, r29.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, r29[0, 7]);
-        Pathfinding.GenerateEdges(cherrygrove, 0, 17, cherrygrove.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, cherrygrove[17, 0]);
-        Pathfinding.GenerateEdges(r30, 0, 17, r30.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, PassNum == 1 ? r30[17, 12] : r30[6, 27]);
-        r29[0, 6].AddEdge(0, new Edge<GscTile> { Action = Action.Left, Cost = 0, NextEdgeset = 0, NextTile = cherrygrove[39, 6] });
-        r29[0, 6].AddEdge(0, new Edge<GscTile> { Action = Action.Left | Action.A, Cost = 0, NextEdgeset = 0, NextTile = cherrygrove[39, 6] });
-        r29[0, 7].AddEdge(0, new Edge<GscTile> { Action = Action.Left, Cost = 0, NextEdgeset = 0, NextTile = cherrygrove[39, 7] });
-        r29[0, 7].AddEdge(0, new Edge<GscTile> { Action = Action.Left | Action.A, Cost = 0, NextEdgeset = 0, NextTile = cherrygrove[39, 7] });
-        cherrygrove[17, 0].AddEdge(0, new Edge<GscTile> { Action = Action.Up, Cost = 0, NextEdgeset = 0, NextTile = r30[7, 53] });
-        cherrygrove[17, 0].AddEdge(0, new Edge<GscTile> { Action = Action.Up | Action.A, Cost = 0, NextEdgeset = 0, NextTile = r30[7, 53] });
-
-        cherrygrove[33, 6].RemoveEdge(0, Action.Down | Action.A);
-        cherrygrove[30, 4].RemoveEdge(0, Action.Left | Action.A);
-        cherrygrove[24, 4].RemoveEdge(0, Action.Left | Action.A);
+        Pathfinding.GenerateEdges(r28, 0, 13, r28.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, r28[33, 6]);
+        Pathfinding.GenerateEdges(silverCaveOutside, 18, 11, silverCaveOutside.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, silverCaveOutside[39, 33]);
+        Pathfinding.GenerateEdges(silverCaveRoom1, 3, 2, silverCaveRoom1.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, silverCaveRoom1[15, 33]);
+		Pathfinding.GenerateEdges(silverCaveRoom2, 6, 5, silverCaveRoom2.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, silverCaveRoom2[19, 31]);
+		Pathfinding.GenerateEdges(silverCaveRoom3, 9, 11, silverCaveRoom3.Tileset.LandPermissions, Action.Left | Action.Right | Action.Up | Action.Down, silverCaveRoom3[10, 33]);
+        r28[0, 12].AddEdge(0, new Edge<GscTile> { Action = Action.Left, Cost = 0, NextEdgeset = 0, NextTile = silverCaveOutside[39, 30] });
+        r28[0, 13].AddEdge(0, new Edge<GscTile> { Action = Action.Left | Action.A, Cost = 0, NextEdgeset = 0, NextTile = silverCaveOutside[39, 31] });
+        r28[0, 12].AddEdge(0, new Edge<GscTile> { Action = Action.Left, Cost = 0, NextEdgeset = 0, NextTile = silverCaveOutside[39, 30] });
+        r28[0, 13].AddEdge(0, new Edge<GscTile> { Action = Action.Left | Action.A, Cost = 0, NextEdgeset = 0, NextTile = silverCaveOutside[39, 31] });
+        silverCaveOutside[18, 12].AddEdge(0, new Edge<GscTile> { Action = Action.Up, Cost = 0, NextEdgeset = 0, NextTile = silverCaveRoom1[9, 33] });
+        silverCaveOutside[18, 12].AddEdge(0, new Edge<GscTile> { Action = Action.Up | Action.A, Cost = 0, NextEdgeset = 0, NextTile = silverCaveRoom1[9, 33] });
+        silverCaveRoom1[15, 2].AddEdge(0, new Edge<GscTile> { Action = Action.Up, Cost = 0, NextEdgeset = 0, NextTile = silverCaveRoom2[17, 31] });
+        silverCaveRoom1[15, 2].AddEdge(0, new Edge<GscTile> { Action = Action.Up | Action.A, Cost = 0, NextEdgeset = 0, NextTile = silverCaveRoom2[17, 31] });
+        silverCaveRoom2[11, 6].AddEdge(0, new Edge<GscTile> { Action = Action.Up, Cost = 0, NextEdgeset = 0, NextTile = silverCaveRoom3[9, 33] });
+        silverCaveRoom2[11, 6].AddEdge(0, new Edge<GscTile> { Action = Action.Up | Action.A, Cost = 0, NextEdgeset = 0, NextTile = silverCaveRoom3[9, 33] });
         gb.Dispose();
     }
 
     public static void StartSearch(int numThreads, int minDelay, int maxDelay) {
-        Console.WriteLine("Buffered=" + Buffered + ", Overflow=" + Overflow);
-        List<byte[][]> stateList = new List<byte[][]>();
-
-        MakeSave();
         Gold gb = new Gold(true);
         List<GscTile> endTiles = new List<GscTile>() { r29[38, 16] };
-        gb.SetTimeSec(120);
-
-        for(int i = 0; i <= (maxDelay - minDelay); i++) {
-            stateList.Add(new byte[60][]);
-        }
 
         new GscIntroSequence(GscStrat.GfSkip, GscStrat.TitleSkip, GscStrat.Continue).ExecuteUntilIGT(gb);
         gb.AdvanceFrames(minDelay, Joypad.Left);

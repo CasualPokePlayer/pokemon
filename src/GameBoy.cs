@@ -11,6 +11,7 @@ public enum LoadFlags : int {
     MultiCartCompat = 0x04,  // Use heuristics to detect and support multicart MBCs disguised as MBC1.
     SgbMode = 0x08,          // Treat the ROM as having SGB support regardless of what its header advertises.
     ReadOnlySav = 0x10,      // Prevent implicit saveSavedata calls for the ROM.
+    NoBios = 0x20,           // Use heuristics to boot without a BIOS.
 }
 
 public struct Registers {
@@ -128,6 +129,10 @@ public partial class GameBoy : IDisposable {
     public void HardReset(bool fade = false) {
         Libgambatte.gambatte_reset(Handle, fade ? 101 * (2 << 14) : 0);
         BufferSamples = 0;
+    }
+	
+    public void SetRTCOffset(int offset) {
+        Libgambatte.gambatte_setrtcdivisoroffset(Handle, offset);
     }
 
     // Emulates 'runsamples' number of samples, or until a video frame has to be drawn. (1 sample = 2 cpu cycles)

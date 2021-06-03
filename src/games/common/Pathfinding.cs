@@ -118,6 +118,17 @@ public static class Pathfinding {
                     Cost = 2,
                 });
             }
+
+            if ((avaiableActions & Action.Delay) > 0)
+            {
+                tile.AddEdge(edgeSet, new Edge<T>
+                {
+                    Action = Action.Delay,
+                    NextTile = tile,
+                    NextEdgeset = edgeSet,
+                    Cost = 2,
+                });
+            }
         }
     }
 
