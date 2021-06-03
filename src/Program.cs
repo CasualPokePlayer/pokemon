@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Numerics;
 
 class Program {
-    static unsafe void Main(string[] args) {
+    static void Main(string[] args) {
         GoldRattataTAS.StartSearch();
     }
 }

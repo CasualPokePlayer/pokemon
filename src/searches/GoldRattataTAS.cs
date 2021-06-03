@@ -32,7 +32,7 @@ public class GoldRattataTASState
 public static class GoldRattataTAS
 {
 
-    const int MaxCost = 50;
+    const int MaxCost = 8;
     static StreamWriter Writer;
     public static HashSet<int> seenStates = new HashSet<int>();
 
@@ -57,7 +57,7 @@ public static class GoldRattataTAS
             if (ret == gb.SYM["RandomEncounter.ok"])
             {
                 gb.RunUntil(gb.SYM["CalcMonStats"]);
-                //if (gb.CpuRead("wEnemyMonSpecies") == gb.Species["RATTATA"].Id && gb.CpuRead("wEnemyMonLevel") == 8)
+                if (gb.CpuRead("wEnemyMonSpecies") == gb.Species["RATTATA"].Id && gb.CpuRead("wEnemyMonLevel") == 8)
                 {
                     int dvs = gb.CpuRead("wEnemyMonDVs") << 8 | gb.CpuRead(gb.SYM["wEnemyMonDVs"] + 1);
 
@@ -67,7 +67,7 @@ public static class GoldRattataTAS
                     int spd = (dvs >> 4) & 0xf;
                     int spc = dvs & 0xf;
 
-					//if (atk == 12 && (def == 11 || def == 15) && spd >= 12 && (spc == 11 || spc == 15))
+					if (atk == 12 && (def == 11 || def == 15) && spd >= 12 && (spc == 11 || spc == 15))
                     {
                         lock (Writer)
                         {
@@ -100,8 +100,8 @@ public static class GoldRattataTAS
 
         GscMap violetCityMap = dummyGb.Maps["VioletCity"];
         GscMap route32map = dummyGb.Maps["Route32"];
-        Pathfinding.GenerateEdges(violetCityMap, 0, 16, violetCityMap.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Up | Action.Left | Action.A, violetCityMap[14, 35]);
-        Pathfinding.GenerateEdges(violetCityMap, 0, 16, violetCityMap.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Up | Action.Left | Action.A, violetCityMap[15, 35]);
+        //Pathfinding.GenerateEdges(violetCityMap, 0, 16, violetCityMap.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Up | Action.Left | Action.Right | Action.A, violetCityMap[14, 35]);
+        Pathfinding.GenerateEdges(violetCityMap, 0, 16, violetCityMap.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Up | Action.Left | Action.Right | Action.A, violetCityMap[15, 35]);
         Pathfinding.GenerateEdges(route32map, 0, 16, route32map.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Left | Action.Right | Action.A, route32map[14, 23]);
         GscTile startTile = violetCityMap[30, 26];
         violetCityMap[14, 35].AddEdge(0, new Edge<GscTile>() { Action = Action.Down, NextTile = route32map[14, 0], NextEdgeset = 0, Cost = 0 });
@@ -117,6 +117,8 @@ public static class GoldRattataTAS
                 int index = (int)parameter;
                 Gold gb = new Gold(true);		
                 Console.WriteLine("starting movie");
+                //gb.Show();
+                gb.SetRTCOffset(-69);
                 gb.PlayBizhawkInputLog("movies/pokegold.txt");
                 Console.WriteLine("finished movie");
                 gb.RunUntil("OWPlayerInput");
@@ -125,6 +127,7 @@ public static class GoldRattataTAS
                     gb.AdvanceFrame();
                     gb.RunUntil("OWPlayerInput");
                 }
+                //gb.Record("a");
 
                 OverworldSearch(gb, new GoldRattataTASState
                 {
