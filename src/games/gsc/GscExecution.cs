@@ -33,9 +33,9 @@ public partial class Gsc {
         foreach(Action action in actions) {
             switch(action & ~Action.A) {
                 case Action.Delay:
-                    InjectOverworld(Joypad.None);
-                    AdvanceFrame(Joypad.None);
-                    ret = Hold(Joypad.None, "OWPlayerInput");
+                    InjectOverworld(Joypad.B);
+                    AdvanceFrame(Joypad.B);
+                    ret = RunUntil("OWPlayerInput");
                     break;
                 case Action.Right:
                 case Action.Left:

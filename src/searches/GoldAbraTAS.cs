@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
-public class GoldRattataTASState
+public class GoldAbraTASState
 {
 
     public string Log;
@@ -31,14 +31,14 @@ public class GoldRattataTASState
 }
 
 // Code heavily plagiarized from: https://github.com/entrpntr/gb-rta-bruteforce/blob/master/src/dabomstew/rta/entei/GSToto.java
-public static class GoldRattataTAS
+public static class GoldAbraTAS
 {
 
-    const int MaxCost = 4;
+    const int MaxCost = 0;
     static StreamWriter Writer;
     public static HashSet<int> seenStates = new HashSet<int>();
 
-    public static void OverworldSearch(Gsc gb, GoldRattataTASState state)
+    public static void OverworldSearch(Gsc gb, GoldAbraTASState state)
     {
         if (!seenStates.Add(state.GetHashCode()))
         {
@@ -61,38 +61,15 @@ public static class GoldRattataTAS
             }
             if (ret == gb.SYM["RandomEncounter.ok"])
             {
-                /*var prerng = (gb.CpuRead("hRandomAdd") << 8) | gb.CpuRead("hRandomSub");
-                var prerdiv = gb.CpuRead(0xFF04);
-                var prerngframe = gb.CpuRead("hVBlankCounter");*/
                 gb.Hold(Joypad.B, gb.SYM["CalcMonStats"]);
-                if (gb.CpuRead("wEnemyMonSpecies") == gb.Species["RATTATA"].Id && gb.CpuRead("wEnemyMonLevel") == 8)
+                if (gb.CpuRead("wEnemyMonSpecies") == gb.Species["ABRA"].Id)
                 {
-                    /*var postrng = (gb.CpuRead("hRandomAdd") << 8) | gb.CpuRead("hRandomSub");
-                    var postrdiv = gb.CpuRead(0xFF04);
-                    var postrngframe = gb.CpuRead("hVBlankCounter");*/
-
-                    int dvs = gb.CpuRead("wEnemyMonDVs") << 8 | gb.CpuRead(gb.SYM["wEnemyMonDVs"] + 1);
-
-                    //int hp = (((dvs >> 9) & 8) | ((dvs >> 6) & 4) | ((dvs >> 3) & 2) | (dvs & 1)) & 0xf;
-                    int atk = (dvs >> 12) & 0xf;
-                    int def = (dvs >> 8) & 0xf;
-                    int spd = (dvs >> 4) & 0xf;
-                    int spc = dvs & 0xf;
-
-                    var statcheck = "";
-                    if (atk == 12 && (def == 11 || def == 15) && spd >= 12 && (spc >= 8 || (spc & 3) >= 2))
+                    lock (Writer)
                     {
-                        statcheck = " !";
-                    }
-
-                    {
-                        lock (Writer)
-                        {
-                            var foundRattata = $"[{state.WastedFrames} cost] {state.Log}{edge.Action.LogString()} - 0x{dvs:x4}" + statcheck;
-                            Writer.WriteLine(foundRattata);
-                            Writer.Flush();
-                            Console.WriteLine(foundRattata);
-                        }
+                        var foundAbra = $"[{state.WastedFrames} cost] {state.Log}{edge.Action.LogString()}";
+                        Writer.WriteLine(foundAbra);
+                        Writer.Flush();
+                        Console.WriteLine(foundAbra);
                     }
                 }
                 continue;
@@ -105,7 +82,7 @@ public static class GoldRattataTAS
             else
                 blockedActions &= ~(Action.A);
 
-            OverworldSearch(gb, new GoldRattataTASState
+            OverworldSearch(gb, new GoldAbraTASState
             {
                 Log = state.Log + edge.Action.LogString() + " ",
                 Tile = edge.NextTile,
@@ -123,22 +100,37 @@ public static class GoldRattataTAS
     public static void StartSearch(int numThreads = 4)
     {
         Gold dummyGb = new Gold();
-        GscMap violetCityMap = dummyGb.Maps["VioletCity"];
-        GscMap route32map = dummyGb.Maps["Route32"];
-        //Pathfinding.GenerateEdges(violetCityMap, 0, 16, violetCityMap.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Up | Action.Left | Action.Right | Action.A, violetCityMap[14, 35]);
-        Pathfinding.GenerateEdges(violetCityMap, 0, 16, violetCityMap.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Up | Action.Left | Action.Right | Action.A, violetCityMap[15, 35]);
-        Pathfinding.GenerateEdges(route32map, 0, 16, route32map.Tileset.LandPermissions, Action.Delay | Action.Down | Action.Left | Action.Right | Action.A, route32map[14, 23]);
-        GscTile startTile = violetCityMap[30, 26];
-        violetCityMap[14, 35].AddEdge(0, new Edge<GscTile>() { Action = Action.Down, NextTile = route32map[14, 0], NextEdgeset = 0, Cost = 0 });
-        violetCityMap[15, 35].AddEdge(0, new Edge<GscTile>() { Action = Action.Down, NextTile = route32map[15, 0], NextEdgeset = 0, Cost = 0 });
-        route32map[15, 20].RemoveEdge(0, Action.Left);
-        route32map[15, 20].RemoveEdge(0, Action.Left | Action.A);
-        route32map[15, 21].RemoveEdge(0, Action.Left);
-        route32map[15, 21].RemoveEdge(0, Action.Left | Action.A);
-        route32map[15, 22].RemoveEdge(0, Action.Left);
-        route32map[15, 22].RemoveEdge(0, Action.Left | Action.A);
+        GscMap route34GateMap = dummyGb.Maps["Route34IlexForestGate"];
+        GscMap route34Map = dummyGb.Maps["Route34"];
+        Pathfinding.GenerateEdges(route34GateMap, 0, 16, route34GateMap.Tileset.LandPermissions, Action.Up | Action.Right | Action.A, route34GateMap[4, 0]);
+        Pathfinding.GenerateEdges(route34GateMap, 0, 16, route34GateMap.Tileset.LandPermissions, Action.Up | Action.Right | Action.A, route34GateMap[5, 0]);
+        Pathfinding.GenerateEdges(route34Map, 0, 16, route34Map.Tileset.LandPermissions, Action.Up | Action.Left | Action.Right | Action.A, route34Map[7, 6]);
+        GscTile startTile = route34GateMap[4, 7];
+        route34GateMap[4, 7].AddEdge(0, new Edge<GscTile>() { Action = Action.Up, NextTile = route34GateMap[4, 6], NextEdgeset = 0, Cost = 0 });
+        route34Map[13, 37].AddEdge(0, new Edge<GscTile>() { Action = Action.Up, NextTile = route34Map[13, 36], NextEdgeset = 0, Cost = 0 });
+        route34Map[14, 37].AddEdge(0, new Edge<GscTile>() { Action = Action.Up, NextTile = route34Map[14, 36], NextEdgeset = 0, Cost = 0 });
+        for (int i = 0; i < 3; i++)
+        {
+            route34Map[13, 36 - i].RemoveEdge(0, Action.Left);
+            route34Map[13, 36 - i].RemoveEdge(0, Action.Left | Action.A);
+            route34Map[13, 36 - i].AddEdge(0, new Edge<GscTile>() { Action = Action.Right, NextTile = route34Map[14, 36 - i], NextEdgeset = 0, Cost = 0 });
+        }
+        for (int i = 0; i < 14; i++)
+        {
+            route34Map[14, 36 - i].RemoveEdge(0, Action.Right);
+            route34Map[14, 36 - i].RemoveEdge(0, Action.Right | Action.A);
+        }
+        for (int i = 0; i < 10; i++)
+        {
+            route34Map[14, 36 - i].RemoveEdge(0, Action.Left);
+            route34Map[14, 36 - i].RemoveEdge(0, Action.Left | Action.A);
+            route34Map[14, 36 - i].AddEdge(0, new Edge<GscTile>() { Action = Action.Up, NextTile = route34Map[14, 35 - i], NextEdgeset = 0, Cost = 0 });
+            route34Map[14, 36 - i].AddEdge(0, new Edge<GscTile>() { Action = Action.Up | Action.A, NextTile = route34Map[14, 35 - i], NextEdgeset = 0, Cost = 0 });
+        }
+        route34GateMap.Sprites.Remove(5, 7);
+        Pathfinding.DebugDrawEdges(route34Map, 0);
         dummyGb.Dispose();
-        Writer = new StreamWriter("gold_rattata_tas" + DateTime.Now.Ticks + ".txt");
+        Writer = new StreamWriter("gold_abra_tas" + DateTime.Now.Ticks + ".txt");
 
         for (int threadIndex = 0; threadIndex < numThreads; threadIndex++)
         {
@@ -151,16 +143,16 @@ public static class GoldRattataTAS
                 switch (index)
                 {
                     case 0:
-                        lcdpattern = "00_00";
+                        lcdpattern = "00";
                         break;
                     case 1:
-                        lcdpattern = "00_11";
+                        lcdpattern = "01";
                         break;
                     case 2:
-                        lcdpattern = "11_00";
+                        lcdpattern = "10";
                         break;
                     case 3:
-                        lcdpattern = "11_11";
+                        lcdpattern = "11";
                         break;
                     default:
                         break;
@@ -171,13 +163,13 @@ public static class GoldRattataTAS
                 }
                 gb.PlayBizhawkInputLog("movies/pokegold_" + lcdpattern + ".txt");
                 Console.WriteLine("finished movie");
+                gb.Record("test");
                 gb.Hold(Joypad.B, "OWPlayerInput");
                 /*for (int i = 0; i < index; i++)
                 {
                     gb.AdvanceFrame();
                     gb.Hold(Joypad.B, "OWPlayerInput");
                 }*/
-                //gb.Record("test");
                 /*var startrng = (gb.CpuRead("hRandomAdd") << 8) | gb.CpuRead("hRandomSub");
                 var startrdiv = gb.CpuRead(0xFF04);
                 var startrngframe = gb.CpuRead("hVBlankCounter");
@@ -186,7 +178,7 @@ public static class GoldRattataTAS
                 Console.WriteLine($"0x{startrngframe:x2}");*/
 
 
-                OverworldSearch(gb, new GoldRattataTASState
+                OverworldSearch(gb, new GoldAbraTASState
                 {
                     Log = $"thread {index} ",
                     Tile = startTile,
