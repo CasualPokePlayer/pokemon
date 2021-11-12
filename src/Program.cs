@@ -14,16 +14,16 @@ class Program
         {
             new Thread(parameter => {
                 int index = (int)parameter;
-				LoadFlags loadFlags = LoadFlags.ReadOnlySav | LoadFlags.NoBios | ((index & 1) == 0 ? 0 : LoadFlags.GcbMode);
-				string romFile = (index / 2) switch
-				{
-					0 => "roms/pokered.gbc",
-					1 => "roms/pokeyellow.gbc",
-					2 => "roms/pokegold.gbc",
-					3 => "roms/pokecrystal.gbc",
-					_ => throw new Exception("wtf?"),
-				};
-				GameBoy gb = new GameBoy(null, romFile, SpeedupFlags.None, loadFlags);
+                LoadFlags loadFlags = LoadFlags.ReadOnlySav | LoadFlags.NoBios | ((index & 1) == 0 ? 0 : LoadFlags.GcbMode);
+                string romFile = (index / 2) switch
+                {
+                    0 => "roms/pokered.gbc",
+                    1 => "roms/pokeyellow.gbc",
+                    2 => "roms/pokegold.gbc",
+                    3 => "roms/pokecrystal.gbc",
+                    _ => throw new Exception("wtf?"),
+                };
+                GameBoy gb = new GameBoy(null, romFile, SpeedupFlags.None, loadFlags);
                 var timer = new Stopwatch();
                 timer.Reset();
                 timer.Start();
