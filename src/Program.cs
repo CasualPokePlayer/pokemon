@@ -31,7 +31,7 @@ class Program
                 {
                     gb.AdvanceFrame();
                 }
-                Console.WriteLine("Ran Thread {0} for 2 minutes with {1} samples emulated, with an average framerate of {2}, using romfile {3} in {4} mode", index, gb.EmulatedSamples, gb.EmulatedSamples / 2097152.0, romFile, (index & 1) == 0 ? "dmg" : "cgb"); 
+                Console.WriteLine("Ran Thread {0} for 2 minutes with {1} samples emulated, with an average framerate of {2} fps, using romfile {3} in {4} mode", index, gb.EmulatedSamples, gb.EmulatedSamples / 35112.0 / 120.0, romFile, (index & 1) == 0 ? "dmg" : "cgb"); 
                 gb.Dispose();
             }).Start(threadIndex);
         }
