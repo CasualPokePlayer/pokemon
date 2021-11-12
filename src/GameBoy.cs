@@ -83,7 +83,7 @@ public partial class GameBoy : IDisposable {
         get { return Libgambatte.gambatte_getdivstate(Handle); }
     }
 
-    public GameBoy(string biosFile, string romFile, SpeedupFlags speedupFlags = SpeedupFlags.None) {
+    public GameBoy(string biosFile, string romFile, SpeedupFlags speedupFlags = SpeedupFlags.None, LoadFlags loadFlags = LoadFlags.GcbMode | LoadFlags.GbaFlag | LoadFlags.ReadOnlySav) {
         ROM = new ROM(romFile);
         Debug.Assert(ROM.HeaderChecksumMatches(), "Cartridge header checksum mismatch!");
 
@@ -91,8 +91,8 @@ public partial class GameBoy : IDisposable {
         //Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x900, 0x31672598) == 0, "Unable to load BIOS!");
         //Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.GbaFlag | LoadFlags.GcbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
 
-        Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x100, 0) == 0, "Unable to load BIOS!");
-        Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.SgbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
+        if ((loadFlags & LoadFlags.NoBios) != LoadFlags.NoBios) { Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x100, 0) == 0, "Unable to load BIOS!"); }
+        Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, loadFlags) == 0, "Unable to load ROM!");
 
         VideoBuffer = new byte[160 * 144 * 4];
         AudioBuffer = new byte[(SamplesPerFrame + 2064) * 2 * 2]; // Stereo 16-bit samples
