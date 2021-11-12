@@ -88,8 +88,11 @@ public partial class GameBoy : IDisposable {
         Debug.Assert(ROM.HeaderChecksumMatches(), "Cartridge header checksum mismatch!");
 
         Handle = Libgambatte.gambatte_create();
-        Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x900, 0x31672598) == 0, "Unable to load BIOS!");
-        Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.GbaFlag | LoadFlags.GcbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
+        //Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x900, 0x31672598) == 0, "Unable to load BIOS!");
+        //Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.GbaFlag | LoadFlags.GcbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
+
+        Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x100, 0) == 0, "Unable to load BIOS!");
+        Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.SgbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
 
         VideoBuffer = new byte[160 * 144 * 4];
         AudioBuffer = new byte[(SamplesPerFrame + 2064) * 2 * 2]; // Stereo 16-bit samples
@@ -130,7 +133,13 @@ public partial class GameBoy : IDisposable {
         Libgambatte.gambatte_reset(Handle, fade ? 101 * (2 << 14) : 0);
         BufferSamples = 0;
     }
-	
+    public void ResetSPC()
+    {
+        byte[] spcBuf = File.ReadAllBytes("roms/sgb2.spc");
+        if (Libgambatte.gambatte_resetspc(Handle, spcBuf, spcBuf.Length) < 0)
+            throw new InvalidOperationException("resetspc returned negative???");
+    }
+
     public void SetRTCOffset(int offset) {
         Libgambatte.gambatte_setrtcdivisoroffset(Handle, offset);
     }
@@ -153,6 +162,47 @@ public partial class GameBoy : IDisposable {
             }
         }
 
+        return Libgambatte.gambatte_gethitinterruptaddress(Handle);
+    }
+
+    // Emulates 'runsamples' number of samples. Forces exactly 'runsamples' number of samples emulated. (1 sample = 2 cpu cycles)
+    public int RunForForce(int runsamples)
+    {
+        if (runsamples == 0)
+        {
+            return Libgambatte.gambatte_gethitinterruptaddress(Handle);
+        }
+        if (runsamples < 0 || runsamples > (SamplesPerFrame + 2064))
+        {
+            throw new ArgumentOutOfRangeException("runsamples", runsamples, "Invalid runsamples");
+        }
+        int samplesToEmit = runsamples;
+        while (true)
+        {
+            runsamples = samplesToEmit;
+            int videoFrameDoneSampleCount = Libgambatte.gambatte_runfor(Handle, VideoBuffer, 160, AudioBuffer, ref runsamples);
+            int outsamples = videoFrameDoneSampleCount >= 0 ? BufferSamples + videoFrameDoneSampleCount : BufferSamples + runsamples;
+            BufferSamples += runsamples;
+            BufferSamples -= outsamples;
+            EmulatedSamples += (ulong)outsamples;
+            samplesToEmit -= runsamples;
+
+            if (Scene != null)
+            {
+                Scene.OnAudioReady(outsamples);
+                // returns a positive value if a video frame needs to be drawn.
+                if (videoFrameDoneSampleCount >= 0)
+                {
+                    Scene.Begin();
+                    Scene.Render();
+                    Scene.End();
+                }
+            }
+            if (samplesToEmit <= 0)
+            {
+                break;
+            }
+        }
         return Libgambatte.gambatte_gethitinterruptaddress(Handle);
     }
 
@@ -330,6 +380,9 @@ public static unsafe class Libgambatte {
 
     [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
     public static extern void gambatte_reset(IntPtr gb, int samplesToStall);
+
+    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int gambatte_resetspc(IntPtr gb, byte[] spcBuf, int len);
 
     [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
     public static extern void gambatte_setinputgetter(IntPtr gb, InputGetter inputgetter);
