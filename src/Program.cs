@@ -10,23 +10,22 @@ class Program
 {
     static void Main(string[] args)
     {
-        for (int threadIndex = 0; threadIndex < 8; threadIndex++)
+        const int numThreads = 1;
+        var timer = new Stopwatch();
+        timer.Reset();
+        timer.Start();
+        for (int threadIndex = 0; threadIndex < numThreads; threadIndex++)
         {
             new Thread(parameter => {
                 int index = (int)parameter;
-                LoadFlags loadFlags = LoadFlags.ReadOnlySav | LoadFlags.NoBios | ((index & 1) == 0 ? 0 : LoadFlags.GcbMode);
+                LoadFlags loadFlags = LoadFlags.ReadOnlySav | LoadFlags.NoBios | LoadFlags.GcbMode;
                 string romFile = (index / 2) switch
                 {
-                    0 => "roms/pokered.gbc",
-                    1 => "roms/pokeyellow.gbc",
-                    2 => "roms/pokegold.gbc",
-                    3 => "roms/pokecrystal.gbc",
-                    _ => throw new Exception("wtf?"),
+                    0 => "roms/sml.gb",
+                    _ => throw new Exception(),
                 };
                 GameBoy gb = new GameBoy(null, romFile, SpeedupFlags.None, loadFlags);
-                var timer = new Stopwatch();
-                timer.Reset();
-                timer.Start();
+                gb.Record("test");
                 while (timer.ElapsedMilliseconds < 120000)
                 {
                     gb.AdvanceFrame();
