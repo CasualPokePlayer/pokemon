@@ -140,8 +140,12 @@ public partial class GameBoy : IDisposable {
         Debug.Assert(ROM.HeaderChecksumMatches(), "Cartridge header checksum mismatch!");
 
         Handle = Libgambatte.gambatte_create();
-        Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x900, 0x31672598) == 0, "Unable to load BIOS!");
-        Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.GbaFlag | LoadFlags.GcbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
+        /*Debug.Assert(Libgambatte.gambatte_loadbios(Handle, biosFile, 0x900, 0x31672598) == 0, "Unable to load BIOS!");
+        Debug.Assert(Libgambatte.gambatte_load(Handle, romFile, LoadFlags.GbaFlag | LoadFlags.GcbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");*/
+        var biosbuf = File.ReadAllBytes(biosFile);
+        Debug.Assert(Libgambatte.gambatte_loadbiosbuf(Handle, biosbuf, biosbuf.Length) == 0, "Unable to load BIOS!");
+        var rombuf = File.ReadAllBytes(romFile);
+        Debug.Assert(Libgambatte.gambatte_loadbuf(Handle, rombuf, rombuf.Length, LoadFlags.GbaFlag | LoadFlags.GcbMode | LoadFlags.ReadOnlySav) == 0, "Unable to load ROM!");
 
         VideoBuffer = new byte[160 * 144 * 4];
         AudioBuffer = new byte[(SamplesPerFrame + 2064) * 2 * 2]; // Stereo 16-bit samples
@@ -204,22 +208,24 @@ public partial class GameBoy : IDisposable {
         return Libgambatte.gambatte_gethitinterruptaddress(Handle);
     }
 
-    // Emulates 'runsamples' number of samples. Forces exactly 'runsamples' number of samples emulated. (1 sample = 2 cpu cycles)
-    public int RunForForce(int runsamples)
+    // Emulates 'runsamples' number of samples. Forces at least 'runsamples' number of samples emulated. (1 sample = 2 cpu cycles)
+    // runsamples will be adjusted according to actual samples ran
+    public int RunForForce(ref int runsamples)
     {
         if (runsamples <= 0 || runsamples > (SamplesPerFrame + 2064))
         {
-            throw new ArgumentOutOfRangeException("Invalid runsamples");
+            throw new ArgumentOutOfRangeException(nameof(runsamples));
         }
-        int samplesToEmit = runsamples;
+
+        int nsamps, samplesToEmit = runsamples;
         while (true)
         {
-            runsamples = samplesToEmit;
-            int videoFrameDoneSampleCount = Libgambatte.gambatte_runfor(Handle, VideoBuffer, 160, AudioBuffer, ref runsamples);
-            int outsamples = videoFrameDoneSampleCount >= 0 ? BufferSamples + videoFrameDoneSampleCount : BufferSamples + runsamples;
-            BufferSamples = BufferSamples + runsamples - outsamples;
-            EmulatedSamples += (ulong)outsamples;
-            samplesToEmit -= runsamples;
+            nsamps = samplesToEmit;
+            int videoFrameDoneSampleCount = Libgambatte.gambatte_runfor(Handle, VideoBuffer, 160, AudioBuffer, ref nsamps);
+            int outsamples = videoFrameDoneSampleCount >= 0 ? BufferSamples + videoFrameDoneSampleCount : BufferSamples + nsamps;
+            BufferSamples = BufferSamples + nsamps - outsamples;
+            EmulatedSamples += (ulong)nsamps;
+            samplesToEmit -= nsamps;
 
             if (Scene != null)
             {
@@ -234,6 +240,7 @@ public partial class GameBoy : IDisposable {
             }
             if (samplesToEmit <= 0)
             {
+                runsamples -= samplesToEmit;
                 break;
             }
         }
@@ -243,8 +250,8 @@ public partial class GameBoy : IDisposable {
 
     public void RunForLongerThanAFrame(int samplesToRun) {
         while (samplesToRun > 0) {
-            int samplesThisRun = samplesToRun >= SamplesPerFrame ? SamplesPerFrame : samplesToRun % SamplesPerFrame;
-            RunForForce(samplesThisRun);
+            int samplesThisRun = Math.Min(samplesToRun, SamplesPerFrame);
+            RunForForce(ref samplesThisRun);
             samplesToRun -= samplesThisRun;
         }
     }
@@ -408,9 +415,7 @@ public partial class GameBoy : IDisposable {
         foreach (string line in inputLogReader.ReadToEnd().Trim().Split('\n')) {
 
             inputTimestamp = line.Split(' ');
-            //maximum offset -321
-            //minimum offset -124
-            samplesToRun = (int)( ulong.Parse(inputTimestamp[0], System.Globalization.NumberStyles.HexNumber) * 512 - EmulatedSamples - 124);
+            samplesToRun = (int)( ulong.Parse(inputTimestamp[0], System.Globalization.NumberStyles.HexNumber) * 512 - EmulatedSamples);
             Joypad input = (Joypad)byte.Parse(inputTimestamp[1].TrimEnd('\r'), System.Globalization.NumberStyles.HexNumber);
             RunForLongerThanAFrame(samplesToRun);
 
@@ -451,7 +456,13 @@ public static unsafe class Libgambatte {
     public static extern int gambatte_load(IntPtr gb, string romfile, LoadFlags flags);
 
     [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int gambatte_loadbuf(IntPtr gb, byte[] romfile, int len, LoadFlags flags);
+
+    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
     public static extern int gambatte_loadbios(IntPtr gb, string biosfile, int size, int crc);
+
+    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int gambatte_loadbiosbuf(IntPtr gb, byte[] biosfile, int size);
 
     // Emulates until at least 'samples' audio samples are produced in the supplied audio buffer, or until a video frame has been drawn.
     // There are 35112 audio (stereo) samples in a video frame.
