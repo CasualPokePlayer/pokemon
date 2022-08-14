@@ -104,7 +104,7 @@ public partial class GameBoy {
 
         ret.HRA = CpuRead("hRandomAdd");
         ret.HRS = CpuRead("hRandomSub");
-        ret.Divider = DividerState;
+        ret.Divider = CpuRead(0xFF04);
         return ret;
     }
 

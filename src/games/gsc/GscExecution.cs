@@ -140,12 +140,7 @@ public partial class Gsc {
     }
 
     public void SetTimeSec(int timesec) {
-        byte[] state = SaveState();
-        state[SaveStateLabels["timesec"] + 0] = (byte) (timesec >> 24);
-        state[SaveStateLabels["timesec"] + 1] = (byte) (timesec >> 16);
-        state[SaveStateLabels["timesec"] + 2] = (byte) (timesec >> 8);
-        state[SaveStateLabels["timesec"] + 3] = (byte) (timesec & 0xff);
-        LoadState(state);
+        throw new NotImplementedException();
     }
 
     public byte[] MakeIGTState(GscIntroSequence intro, byte[] initialState, int igt) {

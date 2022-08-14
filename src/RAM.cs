@@ -6,33 +6,33 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (object) data);
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (object) data);
                 break;
             case TypeCode.Int16:
             case TypeCode.UInt16:
                 ushort u16 = (ushort) (object) data;
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (u16 >> 8));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 1), (byte) (u16 & 0xff));
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u16 >> 8));
+                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u16 & 0xff));
                 break;
             case TypeCode.Int32:
             case TypeCode.UInt32:
                 uint u32 = (uint) (object) data;
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (u32 >> 24));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 1), (byte) (u32 >> 16));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 2), (byte) (u32 >> 8));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 3), (byte) (u32 & 0xff));
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u32 >> 24));
+                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u32 >> 16));
+                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u32 >> 8));
+                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u32 & 0xff));
                 break;
             case TypeCode.Int64:
             case TypeCode.UInt64:
                 ulong u64 = (ulong) (object) data;
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (u64 >> 56));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 1), (byte) (u64 >> 48));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 2), (byte) (u64 >> 40));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 3), (byte) (u64 >> 32));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 4), (byte) (u64 >> 24));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 5), (byte) (u64 >> 16));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 6), (byte) (u64 >> 8));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 7), (byte) (u64 & 0xff));
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u64 >> 56));
+                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u64 >> 48));
+                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u64 >> 40));
+                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u64 >> 32));
+                Lib3dsvc.VC_Poke((ushort) (addr + 4), (byte) (u64 >> 24));
+                Lib3dsvc.VC_Poke((ushort) (addr + 5), (byte) (u64 >> 16));
+                Lib3dsvc.VC_Poke((ushort) (addr + 6), (byte) (u64 >> 8));
+                Lib3dsvc.VC_Poke((ushort) (addr + 7), (byte) (u64 & 0xff));
                 break;
         }
     }
@@ -41,33 +41,33 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (object) data);
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (object) data);
                 break;
             case TypeCode.Int16:
             case TypeCode.UInt16:
                 ushort u16 = (ushort) (object) data;
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (u16 & 0xff));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 1), (byte) (u16 >> 8));
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u16 & 0xff));
+                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u16 >> 8));
                 break;
             case TypeCode.Int32:
             case TypeCode.UInt32:
                 uint u32 = (uint) (object) data;
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (u32 & 0xff));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 1), (byte) (u32 >> 8));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 2), (byte) (u32 >> 16));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 3), (byte) (u32 >> 24));
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u32 & 0xff));
+                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u32 >> 8));
+                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u32 >> 16));
+                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u32 >> 24));
                 break;
             case TypeCode.Int64:
             case TypeCode.UInt64:
                 ulong u64 = (ulong) (object) data;
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr), (byte) (u64 & 0xff));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 1), (byte) (u64 >> 8));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 2), (byte) (u64 >> 16));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 3), (byte) (u64 >> 24));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 4), (byte) (u64 >> 32));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 5), (byte) (u64 >> 40));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 6), (byte) (u64 >> 48));
-                Libgambatte.gambatte_cpuwrite(Handle, (ushort) (addr + 7), (byte) (u64 >> 56));
+                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u64 & 0xff));
+                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u64 >> 8));
+                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u64 >> 16));
+                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u64 >> 24));
+                Lib3dsvc.VC_Poke((ushort) (addr + 4), (byte) (u64 >> 32));
+                Lib3dsvc.VC_Poke((ushort) (addr + 5), (byte) (u64 >> 40));
+                Lib3dsvc.VC_Poke((ushort) (addr + 6), (byte) (u64 >> 48));
+                Lib3dsvc.VC_Poke((ushort) (addr + 7), (byte) (u64 >> 56));
                 break;
         }
     }
@@ -82,20 +82,20 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                return (T) (object) Libgambatte.gambatte_cpuread(Handle, (ushort) (addr));
+                return (T) (object) Lib3dsvc.VC_Peek((ushort) (addr));
             case TypeCode.Int16:
             case TypeCode.UInt16:
-                return (T) (object) (ushort) ((Libgambatte.gambatte_cpuread(Handle, (ushort) (addr)) << 8) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 1))));
+                return (T) (object) (ushort) ((Lib3dsvc.VC_Peek((ushort) (addr)) << 8) | (Lib3dsvc.VC_Peek((ushort) (addr + 1))));
             case TypeCode.Int32:
             case TypeCode.UInt32:
-                return (T) (object) (uint) ((Libgambatte.gambatte_cpuread(Handle, (ushort) (addr)) << 24) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 1)) << 16) |
-                                            (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 2)) << 8) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 3))));
+                return (T) (object) (uint) ((Lib3dsvc.VC_Peek((ushort) (addr)) << 24) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 16) |
+                                            (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 8) | (Lib3dsvc.VC_Peek((ushort) (addr + 3))));
             case TypeCode.Int64:
             case TypeCode.UInt64:
-                return (T) (object) (ulong) ((Libgambatte.gambatte_cpuread(Handle, (ushort) (addr)) << 56) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 1)) << 48) |
-                                             (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 2)) << 40) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 3)) << 32) |
-                                             (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 4)) << 24) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 5)) << 16) |
-                                             (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 6)) << 8) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 7))));
+                return (T) (object) (ulong) ((Lib3dsvc.VC_Peek((ushort) (addr)) << 56) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 48) |
+                                             (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 40) | (Lib3dsvc.VC_Peek((ushort) (addr + 3)) << 32) |
+                                             (Lib3dsvc.VC_Peek((ushort) (addr + 4)) << 24) | (Lib3dsvc.VC_Peek((ushort) (addr + 5)) << 16) |
+                                             (Lib3dsvc.VC_Peek((ushort) (addr + 6)) << 8) | (Lib3dsvc.VC_Peek((ushort) (addr + 7))));
             default: return default;
         }
     }
@@ -104,20 +104,20 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                return (T) (object) Libgambatte.gambatte_cpuread(Handle, (ushort) (addr));
+                return (T) (object) Lib3dsvc.VC_Peek((ushort) (addr));
             case TypeCode.Int16:
             case TypeCode.UInt16:
-                return (T) (object) (ushort) ((Libgambatte.gambatte_cpuread(Handle, (ushort) (addr))) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 1)) << 8));
+                return (T) (object) (ushort) ((Lib3dsvc.VC_Peek((ushort) (addr))) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 8));
             case TypeCode.Int32:
             case TypeCode.UInt32:
-                return (T) (object) (uint) ((Libgambatte.gambatte_cpuread(Handle, (ushort) (addr))) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 1)) << 8) |
-                                            (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 2)) << 16) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 3)) << 24));
+                return (T) (object) (uint) ((Lib3dsvc.VC_Peek((ushort) (addr))) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 8) |
+                                            (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 16) | (Lib3dsvc.VC_Peek((ushort) (addr + 3)) << 24));
             case TypeCode.Int64:
             case TypeCode.UInt64:
-                return (T) (object) (ulong) ((Libgambatte.gambatte_cpuread(Handle, (ushort) (addr))) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 1)) << 8) |
-                                             (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 2)) << 16) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 3)) << 24) |
-                                             (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 4)) << 32) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 5)) << 40) |
-                                             (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 6)) << 48) | (Libgambatte.gambatte_cpuread(Handle, (ushort) (addr + 7)) << 56));
+                return (T) (object) (ulong) ((Lib3dsvc.VC_Peek((ushort) (addr))) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 8) |
+                                             (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 16) | (Lib3dsvc.VC_Peek((ushort) (addr + 3)) << 24) |
+                                             (Lib3dsvc.VC_Peek((ushort) (addr + 4)) << 32) | (Lib3dsvc.VC_Peek((ushort) (addr + 5)) << 40) |
+                                             (Lib3dsvc.VC_Peek((ushort) (addr + 6)) << 48) | (Lib3dsvc.VC_Peek((ushort) (addr + 7)) << 56));
             default: return default;
         }
     }

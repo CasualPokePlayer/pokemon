@@ -252,7 +252,7 @@ public class RedBlue : Rby {
         { ("SaffronPokecenter", 0), 10 },
     };
 
-    public RedBlue(string rom, bool speedup = false) : base(rom, speedup ? SpeedupFlags.All : SpeedupFlags.None) { }
+    public RedBlue(string rom) : base(rom) { }
 
     public override void ChooseMenuItem(int target) {
         RunUntil("_Joypad", "HandleMenuInput_.getJoypadState");
@@ -277,7 +277,7 @@ public class RedBlue : Rby {
 
 public class Red : RedBlue {
 
-    public Red(bool speedup = false) : base("roms/pokered.gbc", speedup) { }
+    public Red() : base("roms/pokered.gbc") { }
 
     public override byte[][] BGPalette() {
         return new byte[][] {
@@ -298,7 +298,7 @@ public class Red : RedBlue {
 
 public class Blue : RedBlue {
 
-    public Blue(bool speedup = false) : base("roms/pokeblue.gbc", speedup) { }
+    public Blue() : base("roms/pokeblue.gbc") { }
 
     public override byte[][] BGPalette() {
         return new byte[][] {

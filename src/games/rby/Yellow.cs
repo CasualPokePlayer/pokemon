@@ -1,6 +1,6 @@
 public class Yellow : Rby {
 
-    public Yellow(bool speedup = false) : base("roms/pokeyellow.gbc", speedup ? SpeedupFlags.NoVideo | SpeedupFlags.NoSound : SpeedupFlags.None) { }
+    public Yellow() : base("roms/pokeyellow.gbc") { }
 
     public override void ChooseMenuItem(int target) {
         RunUntil("_Joypad", "HandleMenuInput_.getJoypadState");

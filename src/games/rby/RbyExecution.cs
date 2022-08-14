@@ -110,8 +110,7 @@ public partial class Rby {
                     AdvanceFrame();
                 } else {
                     // If it is time to break out of the loop, run for 1 sample to allow for continuous calls of this function.
-                    RunFor(1);
-                    break;
+                    throw new NotImplementedException("Cannot run for a sample");
                 }
             }
 

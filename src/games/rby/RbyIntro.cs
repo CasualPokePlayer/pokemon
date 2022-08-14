@@ -203,8 +203,8 @@ public class RbyIntroSequence : List<RbyStrat> {
             { new RbyIntroSequence(RbyStrat.NoPal, RbyStrat.GfSkip, RbyStrat.IntroWait, RbyStrat.TitleSkip, RbyStrat.NewGame), 0xE24E },
         };
 
-        TestIntros(new Red(true), "red", redIntros);
-        TestIntros(new Yellow(true), "yellow", yellowIntros);
+        TestIntros(new Red(), "red", redIntros);
+        TestIntros(new Yellow(), "yellow", yellowIntros);
 
         void TestIntros(Rby gb, string gameName, Dictionary<RbyIntroSequence, ushort> intros) {
             foreach(var i in intros) {

@@ -13,7 +13,7 @@ public class TimerComponent : TextComponent {
     }
 
     public override void BeginScene(GameBoy gb) {
-        TimeSpan duration = TimeSpan.FromSeconds((gb.EmulatedSamples - Start) / 2097152.0);
+        TimeSpan duration = TimeSpan.FromSeconds((gb.EmulatedSamples - Start) / 44100.0);
         if(Running) Text = string.Format("{0:ss\\.fff}", duration);
     }
 }

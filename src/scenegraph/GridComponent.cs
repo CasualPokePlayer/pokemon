@@ -84,8 +84,8 @@ public class GridComponent : Component {
         Texture = Renderer.CreateTexture(Buffer.Width, Buffer.Height, PixelFormat.RGBA);
     }
 
-    public override void BeginScene(GameBoy gb) {
-        byte lcdc = gb.CpuRead(0xff40);
+    public override unsafe void BeginScene(GameBoy gb) {
+        /*byte lcdc = gb.CpuRead(0xff40);
         byte wy = gb.CpuRead(0xff4a);
         byte wx = gb.CpuRead(0xff4b);
         bool windowShown = (lcdc & 0x20) > 0 && wx >= 0 && wx <= 166 && wy >= 0 && wy <= 143;
@@ -131,7 +131,7 @@ public class GridComponent : Component {
         }
 
         if(windowShown) HideMenuTiles(state, gb.SaveStateLabels["vram"] + ((lcdc & 0x40) > 0 ? 0x1c00 : 0x1800), wx - 7, wy);
-        else HideMenuTiles(state, gb.SaveStateLabels["vram"] + ((lcdc & 0x8) > 0 ? 0x1c00 : 0x1800), 0, 0);
+        else HideMenuTiles(state, gb.SaveStateLabels["vram"] + ((lcdc & 0x8) > 0 ? 0x1c00 : 0x1800), 0, 0);*/
 
         Renderer.SetTexturePixels(Texture, Buffer.Pixels, Buffer.Width, PixelFormat.RGBA);
     }

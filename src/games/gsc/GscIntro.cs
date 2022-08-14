@@ -47,7 +47,7 @@ public class GscIntroSequence : List<GscStrat> {
     }
 
     public void ExecuteUntilIGT(Gsc gb) {
-        gb.HardReset(false);
+        gb.HardReset();
         gb.Hold(Joypad.Left, 0x100);
 
         foreach(GscStrat strat in this) {

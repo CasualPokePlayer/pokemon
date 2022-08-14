@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 public class BluePikachuTASState
 {
-
     public string Log;
     public RbyTile Tile;
     public int EdgeSet;
@@ -92,7 +90,7 @@ public static class BluePikachuTAS
         }
     }
 
-    public static void StartSearch(int numThreads = 4)
+    public static void StartSearch()
     {
         Blue dummyGb = new Blue();
 
@@ -120,33 +118,23 @@ public static class BluePikachuTAS
         viridianForestMap[1, 19].GetEdge(0, Action.Up).Cost = 0;
         Writer = new StreamWriter("blue_pikachu_tas" + DateTime.Now.Ticks + ".txt");
 
-        for (int threadIndex = 0; threadIndex < numThreads; threadIndex++)
-        {
-            new Thread(parameter => {
-                int index = (int)parameter;
-                Blue gb = new Blue();
-                gb.SetSpeedupFlags(SpeedupFlags.All);
-                Console.WriteLine("starting movie");
-                gb.PlayBizhawkInputLog("movies/blue.txt");
-                Console.WriteLine("finished movie");
-                gb.RunUntil("JoypadOverworld");
-                for (int i = 0; i < index; i++)
-                {
-                    gb.AdvanceFrame();
-                    gb.RunUntil("JoypadOverworld");
-                }
+        Blue gb = new Blue();
+        Console.WriteLine("starting movie");
+        gb.PlayBizhawkInputLog("movies/blue.txt");
+        Console.WriteLine("finished movie");
+        gb.RunUntil("JoypadOverworld");
+        gb.AdvanceFrame();
+        gb.RunUntil("JoypadOverworld");
 
-                OverworldSearch(gb, new BluePikachuTASState
-                {
-                    Log = $"thread {index} ",
-                    Tile = startTile,
-                    WastedFrames = 0,
-                    EdgeSet = 0,
-                    HRandomAdd = gb.CpuRead("hRandomAdd"),
-                    HRandomSub = gb.CpuRead("hRandomSub"),
-                    RDiv = gb.CpuRead(0xFF04)
-                });
-            }).Start(threadIndex);
-        }
+        OverworldSearch(gb, new BluePikachuTASState
+        {
+            Log = string.Empty,
+            Tile = startTile,
+            WastedFrames = 0,
+            EdgeSet = 0,
+            HRandomAdd = gb.CpuRead("hRandomAdd"),
+            HRandomSub = gb.CpuRead("hRandomSub"),
+            RDiv = gb.CpuRead(0xFF04)
+        });
     }
 }

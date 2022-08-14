@@ -91,7 +91,7 @@ public partial class Rby : GameBoy {
         get { return Data.Maps; }
     }
 
-    public Rby(string rom, SpeedupFlags speedupFlags = SpeedupFlags.None) : base("roms/gbc_bios.bin", rom, speedupFlags) {
+    public Rby(string rom) : base(rom) {
         // If a ROM with the same checksum has already been parsed, the data will be shared.
         if(ParsedROMs.ContainsKey(ROM.GlobalChecksum)) {
             Data = ParsedROMs[ROM.GlobalChecksum];
