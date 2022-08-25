@@ -6,33 +6,33 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (object) data);
+                VC.Poke((ushort) (addr), (byte) (object) data);
                 break;
             case TypeCode.Int16:
             case TypeCode.UInt16:
                 ushort u16 = (ushort) (object) data;
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u16 >> 8));
-                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u16 & 0xff));
+                VC.Poke((ushort) (addr), (byte) (u16 >> 8));
+                VC.Poke((ushort) (addr + 1), (byte) (u16 & 0xff));
                 break;
             case TypeCode.Int32:
             case TypeCode.UInt32:
                 uint u32 = (uint) (object) data;
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u32 >> 24));
-                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u32 >> 16));
-                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u32 >> 8));
-                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u32 & 0xff));
+                VC.Poke((ushort) (addr), (byte) (u32 >> 24));
+                VC.Poke((ushort) (addr + 1), (byte) (u32 >> 16));
+                VC.Poke((ushort) (addr + 2), (byte) (u32 >> 8));
+                VC.Poke((ushort) (addr + 3), (byte) (u32 & 0xff));
                 break;
             case TypeCode.Int64:
             case TypeCode.UInt64:
                 ulong u64 = (ulong) (object) data;
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u64 >> 56));
-                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u64 >> 48));
-                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u64 >> 40));
-                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u64 >> 32));
-                Lib3dsvc.VC_Poke((ushort) (addr + 4), (byte) (u64 >> 24));
-                Lib3dsvc.VC_Poke((ushort) (addr + 5), (byte) (u64 >> 16));
-                Lib3dsvc.VC_Poke((ushort) (addr + 6), (byte) (u64 >> 8));
-                Lib3dsvc.VC_Poke((ushort) (addr + 7), (byte) (u64 & 0xff));
+                VC.Poke((ushort) (addr), (byte) (u64 >> 56));
+                VC.Poke((ushort) (addr + 1), (byte) (u64 >> 48));
+                VC.Poke((ushort) (addr + 2), (byte) (u64 >> 40));
+                VC.Poke((ushort) (addr + 3), (byte) (u64 >> 32));
+                VC.Poke((ushort) (addr + 4), (byte) (u64 >> 24));
+                VC.Poke((ushort) (addr + 5), (byte) (u64 >> 16));
+                VC.Poke((ushort) (addr + 6), (byte) (u64 >> 8));
+                VC.Poke((ushort) (addr + 7), (byte) (u64 & 0xff));
                 break;
         }
     }
@@ -41,33 +41,33 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (object) data);
+                VC.Poke((ushort) (addr), (byte) (object) data);
                 break;
             case TypeCode.Int16:
             case TypeCode.UInt16:
                 ushort u16 = (ushort) (object) data;
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u16 & 0xff));
-                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u16 >> 8));
+                VC.Poke((ushort) (addr), (byte) (u16 & 0xff));
+                VC.Poke((ushort) (addr + 1), (byte) (u16 >> 8));
                 break;
             case TypeCode.Int32:
             case TypeCode.UInt32:
                 uint u32 = (uint) (object) data;
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u32 & 0xff));
-                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u32 >> 8));
-                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u32 >> 16));
-                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u32 >> 24));
+                VC.Poke((ushort) (addr), (byte) (u32 & 0xff));
+                VC.Poke((ushort) (addr + 1), (byte) (u32 >> 8));
+                VC.Poke((ushort) (addr + 2), (byte) (u32 >> 16));
+                VC.Poke((ushort) (addr + 3), (byte) (u32 >> 24));
                 break;
             case TypeCode.Int64:
             case TypeCode.UInt64:
                 ulong u64 = (ulong) (object) data;
-                Lib3dsvc.VC_Poke((ushort) (addr), (byte) (u64 & 0xff));
-                Lib3dsvc.VC_Poke((ushort) (addr + 1), (byte) (u64 >> 8));
-                Lib3dsvc.VC_Poke((ushort) (addr + 2), (byte) (u64 >> 16));
-                Lib3dsvc.VC_Poke((ushort) (addr + 3), (byte) (u64 >> 24));
-                Lib3dsvc.VC_Poke((ushort) (addr + 4), (byte) (u64 >> 32));
-                Lib3dsvc.VC_Poke((ushort) (addr + 5), (byte) (u64 >> 40));
-                Lib3dsvc.VC_Poke((ushort) (addr + 6), (byte) (u64 >> 48));
-                Lib3dsvc.VC_Poke((ushort) (addr + 7), (byte) (u64 >> 56));
+                VC.Poke((ushort) (addr), (byte) (u64 & 0xff));
+                VC.Poke((ushort) (addr + 1), (byte) (u64 >> 8));
+                VC.Poke((ushort) (addr + 2), (byte) (u64 >> 16));
+                VC.Poke((ushort) (addr + 3), (byte) (u64 >> 24));
+                VC.Poke((ushort) (addr + 4), (byte) (u64 >> 32));
+                VC.Poke((ushort) (addr + 5), (byte) (u64 >> 40));
+                VC.Poke((ushort) (addr + 6), (byte) (u64 >> 48));
+                VC.Poke((ushort) (addr + 7), (byte) (u64 >> 56));
                 break;
         }
     }
@@ -82,20 +82,20 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                return (T) (object) Lib3dsvc.VC_Peek((ushort) (addr));
+                return (T) (object) VC.Peek((ushort) (addr));
             case TypeCode.Int16:
             case TypeCode.UInt16:
-                return (T) (object) (ushort) ((Lib3dsvc.VC_Peek((ushort) (addr)) << 8) | (Lib3dsvc.VC_Peek((ushort) (addr + 1))));
+                return (T) (object) (ushort) ((VC.Peek((ushort) (addr)) << 8) | (VC.Peek((ushort) (addr + 1))));
             case TypeCode.Int32:
             case TypeCode.UInt32:
-                return (T) (object) (uint) ((Lib3dsvc.VC_Peek((ushort) (addr)) << 24) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 16) |
-                                            (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 8) | (Lib3dsvc.VC_Peek((ushort) (addr + 3))));
+                return (T) (object) (uint) ((VC.Peek((ushort) (addr)) << 24) | (VC.Peek((ushort) (addr + 1)) << 16) |
+                                            (VC.Peek((ushort) (addr + 2)) << 8) | (VC.Peek((ushort) (addr + 3))));
             case TypeCode.Int64:
             case TypeCode.UInt64:
-                return (T) (object) (ulong) ((Lib3dsvc.VC_Peek((ushort) (addr)) << 56) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 48) |
-                                             (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 40) | (Lib3dsvc.VC_Peek((ushort) (addr + 3)) << 32) |
-                                             (Lib3dsvc.VC_Peek((ushort) (addr + 4)) << 24) | (Lib3dsvc.VC_Peek((ushort) (addr + 5)) << 16) |
-                                             (Lib3dsvc.VC_Peek((ushort) (addr + 6)) << 8) | (Lib3dsvc.VC_Peek((ushort) (addr + 7))));
+                return (T) (object) (ulong) ((VC.Peek((ushort) (addr)) << 56) | (VC.Peek((ushort) (addr + 1)) << 48) |
+                                             (VC.Peek((ushort) (addr + 2)) << 40) | (VC.Peek((ushort) (addr + 3)) << 32) |
+                                             (VC.Peek((ushort) (addr + 4)) << 24) | (VC.Peek((ushort) (addr + 5)) << 16) |
+                                             (VC.Peek((ushort) (addr + 6)) << 8) | (VC.Peek((ushort) (addr + 7))));
             default: return default;
         }
     }
@@ -104,20 +104,20 @@ public partial class GameBoy {
         switch(Type.GetTypeCode(typeof(T))) {
             case TypeCode.Byte:
             case TypeCode.SByte:
-                return (T) (object) Lib3dsvc.VC_Peek((ushort) (addr));
+                return (T) (object) VC.Peek((ushort) (addr));
             case TypeCode.Int16:
             case TypeCode.UInt16:
-                return (T) (object) (ushort) ((Lib3dsvc.VC_Peek((ushort) (addr))) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 8));
+                return (T) (object) (ushort) ((VC.Peek((ushort) (addr))) | (VC.Peek((ushort) (addr + 1)) << 8));
             case TypeCode.Int32:
             case TypeCode.UInt32:
-                return (T) (object) (uint) ((Lib3dsvc.VC_Peek((ushort) (addr))) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 8) |
-                                            (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 16) | (Lib3dsvc.VC_Peek((ushort) (addr + 3)) << 24));
+                return (T) (object) (uint) ((VC.Peek((ushort) (addr))) | (VC.Peek((ushort) (addr + 1)) << 8) |
+                                            (VC.Peek((ushort) (addr + 2)) << 16) | (VC.Peek((ushort) (addr + 3)) << 24));
             case TypeCode.Int64:
             case TypeCode.UInt64:
-                return (T) (object) (ulong) ((Lib3dsvc.VC_Peek((ushort) (addr))) | (Lib3dsvc.VC_Peek((ushort) (addr + 1)) << 8) |
-                                             (Lib3dsvc.VC_Peek((ushort) (addr + 2)) << 16) | (Lib3dsvc.VC_Peek((ushort) (addr + 3)) << 24) |
-                                             (Lib3dsvc.VC_Peek((ushort) (addr + 4)) << 32) | (Lib3dsvc.VC_Peek((ushort) (addr + 5)) << 40) |
-                                             (Lib3dsvc.VC_Peek((ushort) (addr + 6)) << 48) | (Lib3dsvc.VC_Peek((ushort) (addr + 7)) << 56));
+                return (T) (object) (ulong) ((VC.Peek((ushort) (addr))) | (VC.Peek((ushort) (addr + 1)) << 8) |
+                                             (VC.Peek((ushort) (addr + 2)) << 16) | (VC.Peek((ushort) (addr + 3)) << 24) |
+                                             (VC.Peek((ushort) (addr + 4)) << 32) | (VC.Peek((ushort) (addr + 5)) << 40) |
+                                             (VC.Peek((ushort) (addr + 6)) << 48) | (VC.Peek((ushort) (addr + 7)) << 56));
             default: return default;
         }
     }

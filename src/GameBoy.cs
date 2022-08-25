@@ -50,6 +50,7 @@ public partial class GameBoy : IDisposable {
 
     public const int SamplesPerFrame = 35112;
 
+    public Lib3dsvc VC;
     public byte[] VideoBuffer; // Although shared library outputs in the ARGB little-endian format, the data is interpreted as big-endian making it effectively BGRA.
     public byte[] AudioBuffer;
     public Joypad CurrentJoypad;
@@ -64,15 +65,16 @@ public partial class GameBoy : IDisposable {
 
     // Get Reg and flag values.
     public Registers Registers {
-        get { Lib3dsvc.VC_GetRegs(out Registers regs); return regs; }
+        get { VC.GetRegs(out Registers regs); return regs; }
     }
 
     public GameBoy(string romFile) {
+        VC = new Lib3dsvc();
         ROM = new ROM(romFile);
         Debug.Assert(ROM.HeaderChecksumMatches(), "Cartridge header checksum mismatch!");
 
         var rombuf = File.ReadAllBytes(romFile);
-        Lib3dsvc.VC_Init(rombuf, rombuf.Length);
+        VC.Init(rombuf, rombuf.Length);
 
         VideoBuffer = new byte[160 * 144 * 4];
         AudioBuffer = new byte[(SamplesPerFrame + 2064) * 2 * 2]; // Stereo 16-bit samples
@@ -83,22 +85,23 @@ public partial class GameBoy : IDisposable {
             ROM.Symbols = SYM;
         }
 
-        StateSize = Lib3dsvc.VC_StateLength();
+        StateSize = VC.StateLength();
     }
 
     public void Dispose() {
         if(Scene != null) Scene.Dispose();
-        Lib3dsvc.VC_Deinit();
+        VC.Deinit();
+        VC.Dispose();
     }
 
     public void HardReset() {
-        Lib3dsvc.VC_Reset();
+        VC.Reset();
         BufferSamples = 0;
     }
 
     // Emulates 'runsamples' number of samples, or until a video frame has to be drawn. (1 sample = 2 cpu cycles)
     public int RunFor() {
-        int ret = Lib3dsvc.VC_RunFrame(CurrentJoypad, VideoBuffer, AudioBuffer, out var runsamples);
+        int ret = VC.RunFrame(CurrentJoypad, VideoBuffer, AudioBuffer, out var runsamples);
 
         int outsamples = BufferSamples + runsamples;
         BufferSamples += runsamples;
@@ -133,12 +136,12 @@ public partial class GameBoy : IDisposable {
     // Emulates while holding the specified input until the program counter hits one of the specified breakpoints.
     public unsafe int Hold(Joypad joypad, params int[] addrs) {
         fixed(int* addrPtr = addrs) { // Note: Not fixing the pointer causes an AccessValidationException.
-            Lib3dsvc.VC_SetInterruptAddresses(addrPtr, addrs.Length);
+            VC.SetInterruptAddresses(addrPtr, addrs.Length);
             int hitaddress;
             do {
                 hitaddress = AdvanceFrame(joypad);
             } while(Array.IndexOf(addrs, hitaddress) == -1);
-            Lib3dsvc.VC_SetInterruptAddresses(null, 0);
+            VC.SetInterruptAddresses(null, 0);
             return hitaddress;
         }
     }
@@ -150,18 +153,18 @@ public partial class GameBoy : IDisposable {
 
     // Writes one byte of data to the CPU bus.
     public void CpuWrite(int addr, byte data) {
-        Lib3dsvc.VC_Poke((ushort)addr, data);
+        VC.Poke((ushort)addr, data);
     }
 
     // Reads one byte of data from the CPU bus.
     public byte CpuRead(int addr) {
-        return Lib3dsvc.VC_Peek((ushort)addr);
+        return VC.Peek((ushort)addr);
     }
 
     // Returns the emulator state as a buffer.
     public byte[] SaveState() {
         byte[] state = new byte[StateSize];
-        Lib3dsvc.VC_SaveStateBinary(state, StateSize);
+        VC.SaveStateBinary(state, StateSize);
         return state;
     }
 
@@ -172,7 +175,7 @@ public partial class GameBoy : IDisposable {
 
     // Loads the emulator state given by a buffer.
     public void LoadState(byte[] buffer) {
-        Lib3dsvc.VC_LoadStateBinary(buffer, buffer.Length);
+        VC.LoadStateBinary(buffer, buffer.Length);
     }
 
     // Helper function that reads the buffer directly from disk.
@@ -251,40 +254,116 @@ public partial class GameBoy : IDisposable {
     }
 }
 
-public static unsafe class Lib3dsvc {
+public static class Kernel32Imports
+{
+    [DllImport("kernel32.dll")]
+    public static extern bool FreeLibrary(IntPtr hModule);
 
-    public const string dll = "lib3dsvc.dll";
+    [DllImport("kernel32.dll")]
+    public static extern uint GetLastError();
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void VC_Init(byte[] rom, int sz);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void VC_Deinit();
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr LoadLibrary(string dllToLoad);
+}
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int VC_RunFrame(Joypad input, byte[] videoBuf, byte[] audioBuf, out int samples);
+public class Lib3dsvc : IDisposable
+{
+    private string _tempDllPath;
+    private IntPtr HModule { get; set; }
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void VC_Reset();
+    public Lib3dsvc()
+    {
+        _tempDllPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "-" + dll);
+        File.Copy(dll, _tempDllPath, true);
+        HModule = Kernel32Imports.LoadLibrary(_tempDllPath);
+        if (HModule == IntPtr.Zero)
+        {
+            Dispose();
+            throw new Exception("Could not load dll, " +
+                $"error code: {Kernel32Imports.GetLastError()}");
+        }
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int VC_StateLength();
+        foreach (var fi in GetType().GetFields())
+        {
+            if (typeof(Delegate).IsAssignableFrom(fi.FieldType))
+            {
+                var fp = Kernel32Imports.GetProcAddress(HModule, fi.FieldType.Name);
+                if (fp == IntPtr.Zero)
+                {
+                    Dispose();
+                    throw new Exception($"Could not get proc {fi.FieldType.Name}, " +
+                        $"error code: {Kernel32Imports.GetLastError()}");
+                }
+                
+                fi.SetValue(this, Marshal.GetDelegateForFunctionPointer(fp, fi.FieldType));
+            }
+        }
+    }
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool VC_SaveStateBinary(byte[] stateBuf, int size);
+    public void Dispose()
+    {
+        if (HModule != IntPtr.Zero)
+        {
+            Kernel32Imports.FreeLibrary(HModule);
+            HModule = IntPtr.Zero;
+        }
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool VC_LoadStateBinary(byte[] stateBuf, int size);
+        if (!string.IsNullOrEmpty(_tempDllPath) && File.Exists(_tempDllPath))
+        {
+            File.Delete(_tempDllPath);
+        }
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern byte VC_Peek(ushort addr);
+        _tempDllPath = null;
+    }
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void VC_Poke(ushort addr, byte value);
+    private const string dll = "lib3dsvc.dll";
+    private const CallingConvention cc = CallingConvention.Cdecl;
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void VC_GetRegs(out Registers regs);
+    public readonly VC_Init Init;
+    public readonly VC_Deinit Deinit;
+    public readonly VC_RunFrame RunFrame;
+    public readonly VC_Reset Reset;
+    public readonly VC_StateLength StateLength;
+    public readonly VC_SaveStateBinary SaveStateBinary;
+    public readonly VC_LoadStateBinary LoadStateBinary;
+    public readonly VC_Peek Peek;
+    public readonly VC_Poke Poke;
+    public readonly VC_GetRegs GetRegs;
+    public readonly VC_SetInterruptAddresses SetInterruptAddresses;
 
-    [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void VC_SetInterruptAddresses(int* addrs, int numAddrs);
+    [UnmanagedFunctionPointer(cc)]
+    public delegate void VC_Init(byte[] rom, int sz);
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate void VC_Deinit();
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate int VC_RunFrame(Joypad input, byte[] videoBuf, byte[] audioBuf, out int samples);
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate void VC_Reset();
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate int VC_StateLength();
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate bool VC_SaveStateBinary(byte[] stateBuf, int size);
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate bool VC_LoadStateBinary(byte[] stateBuf, int size);
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate byte VC_Peek(ushort addr);
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate void VC_Poke(ushort addr, byte value);
+
+    [UnmanagedFunctionPointer(cc)]
+    public delegate void VC_GetRegs(out Registers regs);
+
+    [UnmanagedFunctionPointer(cc)]
+    public unsafe delegate void VC_SetInterruptAddresses(int* addrs, int numAddrs);
 }
